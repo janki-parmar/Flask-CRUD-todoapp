@@ -30,13 +30,13 @@ def create():
             db.session.commit()
 
     allTodo = Todo.query.all()
-    return render_template('index.html', all= allTodo)
+    return render_template('home.html', all= allTodo)
     
 
 @app.route("/show")
 def show():
     allTodo = Todo.query.all()
-    return "This is product page."
+    return render_template('show.html', all= allTodo)
 
 
 @app.route("/update/<int:sno>", methods = ['GET','POST'])
@@ -51,7 +51,7 @@ def update(sno):
         
         db.session.add(todo)
         db.session.commit()
-        return redirect('/')
+        return redirect('/show')
 
     todo = Todo.query.filter_by(sno=sno).first()
     return render_template('update.html', todo= todo)
@@ -62,7 +62,7 @@ def delete(sno):
     todo = Todo.query.filter_by(sno=sno).first()
     db.session.delete(todo)
     db.session.commit()
-    return redirect('/')
+    return redirect('/show')
 
 if __name__ == "__main__":
     app.run(debug=True,port=5000)
