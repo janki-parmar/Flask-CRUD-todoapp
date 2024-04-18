@@ -19,25 +19,23 @@ class Todo(db.Model):
     
 
 @app.route("/" , methods = ['GET','POST'])
-def hello():
+def create():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['desc']
 
-        todo = Todo(title=title, desc=description)
-        
-        db.session.add(todo)
-        db.session.commit()
+        if title.strip() and description.strip() != '':
+            todo = Todo(title=title, desc=description)
+            db.session.add(todo)
+            db.session.commit()
 
     allTodo = Todo.query.all()
-    # print("=-=-=-=-=-=-=-",allTodo)
     return render_template('index.html', all= allTodo)
     
 
 @app.route("/show")
-def products():
+def show():
     allTodo = Todo.query.all()
-    # print("=-=-=-=--==-=--==-=",allTodo)
     return "This is product page."
 
 
@@ -67,4 +65,4 @@ def delete(sno):
     return redirect('/')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=5000)
