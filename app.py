@@ -24,6 +24,10 @@ class Todo(db.Model):
 def login():
     return render_template('login.html')
 
+@app.route("/signup")
+def signup():
+    return render_template('signup.html')
+
 
 
 @app.route("/home" , methods = ['GET','POST'])
@@ -72,7 +76,9 @@ def delete(sno):
 
 
 
-# app = Flask(__name__, static_folder='static')
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run( debug=True)
+
+app = Flask(__name__, static_folder='static')
