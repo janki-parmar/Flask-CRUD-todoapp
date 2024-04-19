@@ -10,6 +10,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(200), nullable=False, unique=True)
+    password = db.Column(db.String(500), nullable=False)
+    dateofbirth = db.Column(db.String(10), nullable=False)  # Adjust as per your requirements
+
+    def __repr__(self):
+        return f"<User {self.id} - {self.username}>"
+
 class Todo(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -20,17 +30,39 @@ class Todo(db.Model):
             return f"{self.sno} - {self.title}"
     
 
-@app.route("/")
+@app.route("/", methods = ['GET','POST'])
 def login():
+    if request.method == 'POST':
+        if 'email' in request.form and 'password' in request.form:
+            email = request.form['email']
+            password = request.form['password']
+
+            data = User.query.all()
+            for i in data:
+                if i.email == email and i.password == password:
+                    return redirect('/home')
+
     return render_template('login.html')
 
-@app.route("/signup")
+
+@app.route("/signup", methods = ['GET','POST'])
 def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        dateofbirth = request.form['dateofbirth']
+
+        if username.strip() and email.strip() and password.strip() and dateofbirth.strip() != '':
+            userdata = User(username=username, email=email, password=password, dateofbirth=dateofbirth)
+            db.session.add(userdata)
+            db.session.commit()
+            return redirect('/')
     return render_template('signup.html')
 
 
 
-@app.route("/home" , methods = ['GET','POST'])
+@app.route("/home", methods = ['GET','POST'])
 def create():
     if request.method == 'POST':
         title = request.form['title']
@@ -40,6 +72,7 @@ def create():
             todo = Todo(title=title, desc=description)
             db.session.add(todo)
             db.session.commit()
+            return redirect('/home')
     return render_template('home.html')
     
 
@@ -78,7 +111,10 @@ def delete(sno):
 
 
 
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run( debug=True)
 
 app = Flask(__name__, static_folder='static')
