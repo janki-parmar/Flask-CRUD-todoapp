@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, request, render_template,redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///todo.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -18,7 +20,13 @@ class Todo(db.Model):
             return f"{self.sno} - {self.title}"
     
 
-@app.route("/" , methods = ['GET','POST'])
+@app.route("/")
+def login():
+    return render_template('login.html')
+
+
+
+@app.route("/home" , methods = ['GET','POST'])
 def create():
     if request.method == 'POST':
         title = request.form['title']
@@ -28,9 +36,7 @@ def create():
             todo = Todo(title=title, desc=description)
             db.session.add(todo)
             db.session.commit()
-
-    allTodo = Todo.query.all()
-    return render_template('home.html', all= allTodo)
+    return render_template('home.html')
     
 
 @app.route("/show")
@@ -64,5 +70,9 @@ def delete(sno):
     db.session.commit()
     return redirect('/show')
 
-if __name__ == "__main__":
-    app.run(debug=True,port=5000)
+
+
+# app = Flask(__name__, static_folder='static')
+
+if __name__ == '__main__':
+    app.run()
